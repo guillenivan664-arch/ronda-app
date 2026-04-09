@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ronda Online 2026</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+        body { background: #1a472a; color: white; font-family: sans-serif; text-align: center; }
+        .zona { display: flex; justify-content: center; gap: 10px; min-height: 150px; margin: 20px; border: 1px solid #3d8c5d; border-radius: 10px; }
+        .carta { width: 70px; height: 110px; background: white; color: black; border-radius: 5px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; font-weight: bold; }
+        .btn-social { background: #25d366; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        #sala-info { background: rgba(0,0,0,0.4); padding: 15px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="sala-info">
+        <h2>Ronda Pro - Multijugador</h2>
+        <button onclick="crearSala()">Crear Sala Privada</button>
+        <button onclick="unirseASala()">Unirse a Sala</button>
+        <div id="area-compartir" style="display:none; margin-top:10px;">
+            <p>Sala: <strong id="codigo-txt"></strong></p>
+            <button class="btn-social" onclick="compartirWhatsApp()">Enviar Invitación por WhatsApp 📱</button>
+        </div>
+    </div>
+
+    <div id="marcador">Puntos: <span id="pts">0</span> | Rival: <span id="pts-rival">0</span></div>
+    
+    <h3>Mesa</h3>
+    <div id="mesa" class="zona"></div>
+
+    <h3>Tu Mano</h3>
+    <div id="mano" class="zona"></div>
+
+    <script>
+        const socket = io("TU_URL_DE_RENDER_AQUI"); // IMPORTANTE: Cambia esto luego
+        let miSala = "";
+        let mano = [];
+        let mesa = [];
+        let puntos = 0;
+
+        function crearSala() {
+            miSala = Math.floor(1000 + Math.random() * 9000).toString();
+            socket.emit('crear-sala', miSala);
+            mostrarInfoSala();
+        }
+
+        function mostrarInfoSala() {
+            document.getElementById('area-compartir').style.display = 'block';
+            document.getElementById('codigo-txt').innerText = miSala;
+        }
+
+        function compartirWhatsApp() {
+            const msj = `¡Echa una partida de Ronda conmigo! Entra y pon el código: ${miSala}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msj)}`, '_blank');
+        }
+
+        function unirseASala() {
+            miSala = prompt("Código de 4 dígitos:");
+            if(miSala) {
+                socket.emit('unirse-sala', miSala);
+                mostrarInfoSala();
+            }
+        }
+
+        // Lógica de juego aquí (usando los códigos anteriores de Ronda/Trivilín)
+        // Cada vez que juegues una carta:
+        // socket.emit('accion-juego', { salaID: miSala, carta: cartaJugada });
+    </script>
+</body>
+</html>
